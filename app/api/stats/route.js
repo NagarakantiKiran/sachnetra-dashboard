@@ -5,12 +5,12 @@ export async function GET() {
   try {
     const [todayStats, weekStats, sentimentStats, marketMoving, threatHigh] =
       await Promise.all([
-        // Total news today
+        // Total news today (IST aware)
         query(`
           SELECT COUNT(*) as count
           FROM india_news_signals
-          WHERE published_at >= CURRENT_DATE
-            AND published_at < CURRENT_DATE + INTERVAL '1 day'
+          WHERE published_at >= (NOW() AT TIME ZONE 'Asia/Kolkata')::date
+            AND published_at < (NOW() AT TIME ZONE 'Asia/Kolkata')::date + INTERVAL '1 day'
         `),
         // Total news this week
         query(`
@@ -29,19 +29,21 @@ export async function GET() {
             AND sentiment_label IS NOT NULL
           GROUP BY sentiment_label
         `),
-        // Market moving count today
+        // Market moving count today (IST aware)
         query(`
           SELECT COUNT(*) as count
           FROM india_news_signals
           WHERE is_market_moving = true
-            AND published_at >= CURRENT_DATE
+            AND published_at >= (NOW() AT TIME ZONE 'Asia/Kolkata')::date
+            AND published_at < (NOW() AT TIME ZONE 'Asia/Kolkata')::date + INTERVAL '1 day'
         `),
-        // High threat level today
+        // High threat level today (IST aware)
         query(`
           SELECT COUNT(*) as count
           FROM india_news_signals
           WHERE threat_level = 'high'
-            AND published_at >= NOW() - INTERVAL '24 hours'
+            AND published_at >= (NOW() AT TIME ZONE 'Asia/Kolkata')::date
+            AND published_at < (NOW() AT TIME ZONE 'Asia/Kolkata')::date + INTERVAL '1 day'
         `),
       ]);
 
