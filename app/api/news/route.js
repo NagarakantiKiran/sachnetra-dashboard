@@ -60,7 +60,7 @@ export async function GET(request) {
           sentiment_score, sentiment_label,
           threat_level, event_category, event_type,
           is_market_moving, nse_tickers, sectors, companies,
-          relevance_class
+          relevance_class, ai_summary, ai_meaning
         FROM india_news_signals
         ${whereClause}
         ORDER BY ${safeSort} ${sortDir}

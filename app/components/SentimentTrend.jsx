@@ -24,7 +24,16 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function SentimentTrend({ data, loading }) {
+const RANGES = [
+  { label: "1W", days: 7 },
+  { label: "1M", days: 30 },
+  { label: "3M", days: 90 },
+  { label: "6M", days: 180 },
+  { label: "1Y", days: 365 },
+  { label: "MAX", days: 1095 },
+];
+
+export default function SentimentTrend({ data, loading, range, onRangeChange }) {
   if (loading) {
     return (
       <div className="card">
@@ -41,11 +50,28 @@ export default function SentimentTrend({ data, loading }) {
 
   return (
     <div className="card">
-      <div className="mb-6">
+      <div className="mb-2">
         <h2 className="text-sm font-mono text-zinc-400 uppercase tracking-widest">
           Sentiment Trend
         </h2>
         <p className="text-xs text-zinc-600 mt-0.5">Daily avg score · -1.0 bearish → +1.0 bullish</p>
+      </div>
+
+      {/* Trading-style range selector */}
+      <div className="flex gap-0.5 mb-5 border-b border-zinc-800 pb-3">
+        {RANGES.map((r) => (
+          <button
+            key={r.label}
+            onClick={() => onRangeChange(r.days)}
+            className={`px-2.5 py-1 text-xs font-mono rounded transition-all ${
+              range === r.days
+                ? "text-sky-400 border-b-2 border-sky-400 bg-sky-500/10"
+                : "text-zinc-600 hover:text-zinc-300"
+            }`}
+          >
+            {r.label}
+          </button>
+        ))}
       </div>
 
       <ResponsiveContainer width="100%" height={220}>

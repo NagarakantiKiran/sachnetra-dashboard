@@ -1,3 +1,16 @@
+# Fix: News Table + AI Detail Slide-Over Panel
+
+## Architecture Change
+Remove AI Summary and Market Meaning from the table entirely.
+Add a right-side slide-over panel that opens when a row is clicked.
+
+---
+
+## File: `app/components/NewsTable.jsx`
+
+### Full replacement — replace the ENTIRE file content with this:
+
+```jsx
 "use client";
 import { useState, useEffect, useCallback } from "react";
 
@@ -488,3 +501,22 @@ export default function NewsTable() {
     </>
   );
 }
+```
+
+---
+
+## After Making Changes
+
+```bash
+npm run dev
+```
+
+## What Changes in the UI
+- Table stays clean with exactly 7 compact columns
+- `THREAT_LEVEL_UNSPECIFIED` and similar raw values are hidden
+- Clicking any row opens a right-side slide-over panel
+- Panel shows: headline, source, published, event, sentiment score, tickers, sectors, companies
+- Panel shows AI Summary (blue tinted box) and Market Meaning (green tinted box)
+- Press Escape or click backdrop to close panel
+- "Read Full Article →" button at bottom of panel
+- No more broken expanded rows inside the table

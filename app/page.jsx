@@ -12,20 +12,21 @@ export default function Dashboard() {
   const [sentiment, setSentiment] = useState(null);
   const [tickers, setTickers] = useState(null);
   const [loading, setLoading] = useState({ stats: true, volume: true, sentiment: true, tickers: true });
-  const [days, setDays] = useState(30);
+  const [volumeRange, setVolumeRange] = useState(7);
+  const [sentimentRange, setSentimentRange] = useState(7);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   const normalizeArray = (value) => (Array.isArray(value) ? value : []);
   const normalizeObject = (value) =>
     value && typeof value === "object" && !Array.isArray(value) && !value.error ? value : null;
 
-  const fetchAll = async (d = days) => {
+  const fetchAll = async (vRange = volumeRange, sRange = sentimentRange) => {
     setLoading({ stats: true, volume: true, sentiment: true, tickers: true });
 
     const [s, v, sent, t] = await Promise.allSettled([
       fetch("/api/stats").then((r) => r.json()),
-      fetch(`/api/volume?days=${d}`).then((r) => r.json()),
-      fetch(`/api/sentiment?days=${d}`).then((r) => r.json()),
+      fetch(`/api/volume?days=${vRange}`).then((r) => r.json()),
+      fetch(`/api/sentiment?days=${sRange}`).then((r) => r.json()),
       fetch("/api/tickers").then((r) => r.json()),
     ]);
 
@@ -38,13 +39,13 @@ export default function Dashboard() {
     setLastUpdated(new Date());
   };
 
-  useEffect(() => { fetchAll(days); }, [days]);
+  useEffect(() => { fetchAll(volumeRange, sentimentRange); }, [volumeRange, sentimentRange]);
 
   // Auto-refresh every 5 minutes
   useEffect(() => {
-    const interval = setInterval(() => fetchAll(days), 5 * 60 * 1000);
+    const interval = setInterval(() => fetchAll(volumeRange, sentimentRange), 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [days]);
+  }, [volumeRange, sentimentRange]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -70,24 +71,8 @@ export default function Dashboard() {
               </span>
             )}
 
-            <div className="flex gap-1">
-              {[7, 30, 90].map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setDays(d)}
-                  className={`px-3 py-1.5 text-xs font-mono rounded-md transition-all ${
-                    days === d
-                      ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
-                      : "text-zinc-500 hover:text-zinc-300"
-                  }`}
-                >
-                  {d}d
-                </button>
-              ))}
-            </div>
-
             <button
-              onClick={() => fetchAll(days)}
+              onClick={() => fetchAll()}
               className="px-3 py-1.5 text-xs font-mono bg-zinc-800 text-zinc-400 rounded-md hover:bg-zinc-700 hover:text-zinc-200 transition-all"
             >
               ↻ Refresh
@@ -103,8 +88,8 @@ export default function Dashboard() {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <VolumeChart data={volume} loading={loading.volume} />
-          <SentimentTrend data={sentiment} loading={loading.sentiment} />
+          <VolumeChart data={volume} loading={loading.volume} range={volumeRange} onRangeChange={(r) => setVolumeRange(r)} />
+          <SentimentTrend data={sentiment} loading={loading.sentiment} range={sentimentRange} onRangeChange={(r) => setSentimentRange(r)} />
         </div>
 
         {/* Tickers + Table */}

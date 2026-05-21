@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const days = parseInt(searchParams.get("days") || "30");
+  const days = Math.min(parseInt(searchParams.get("days") || "30"), 1095);
 
   try {
     const result = await query(`

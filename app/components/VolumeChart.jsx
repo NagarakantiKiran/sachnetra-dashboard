@@ -21,7 +21,16 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function VolumeChart({ data, loading }) {
+const RANGES = [
+  { label: "1W", days: 7 },
+  { label: "1M", days: 30 },
+  { label: "3M", days: 90 },
+  { label: "6M", days: 180 },
+  { label: "1Y", days: 365 },
+  { label: "MAX", days: 1095 },
+];
+
+export default function VolumeChart({ data, loading, range, onRangeChange }) {
   const [view, setView] = useState("total"); // total | sentiment
 
   if (loading) {
@@ -40,7 +49,7 @@ export default function VolumeChart({ data, loading }) {
 
   return (
     <div className="card">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <div>
           <h2 className="text-sm font-mono text-zinc-400 uppercase tracking-widest">
             News Volume
@@ -52,7 +61,7 @@ export default function VolumeChart({ data, loading }) {
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`px-3 py-1 text-xs font-mono rounded-md transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-md transition-all ${
                 view === v
                   ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
                   : "text-zinc-500 hover:text-zinc-300"
@@ -62,6 +71,23 @@ export default function VolumeChart({ data, loading }) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Trading-style range selector */}
+      <div className="flex gap-0.5 mb-5 border-b border-zinc-800 pb-3">
+        {RANGES.map((r) => (
+          <button
+            key={r.label}
+            onClick={() => onRangeChange(r.days)}
+            className={`px-2.5 py-1 text-xs font-mono rounded transition-all ${
+              range === r.days
+                ? "text-sky-400 border-b-2 border-sky-400 bg-sky-500/10"
+                : "text-zinc-600 hover:text-zinc-300"
+            }`}
+          >
+            {r.label}
+          </button>
+        ))}
       </div>
 
       <ResponsiveContainer width="100%" height={220}>
