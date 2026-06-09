@@ -21,7 +21,7 @@ export default function OverviewCards({ data, loading }) {
     {
       label: "Today's News",
       value: data.todayCount,
-      sub: `${data.weekCount} this week`,
+      sub: `${data.totalCount} total collected`,
       icon: "📰",
       accent: "#38bdf8",
     },

@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const [todayStats, weekStats, sentimentStats, marketMoving, threatHigh] =
+    const [todayStats, weekStats, totalStats, sentimentStats, marketMoving, threatHigh] =
       await Promise.all([
         // Total news today (IST aware)
         query(`
@@ -20,6 +20,11 @@ export async function GET() {
           SELECT COUNT(*) as count
           FROM india_news_signals
           WHERE published_at >= date_trunc('week', NOW())
+        `),
+        // Total news all time
+        query(`
+          SELECT COUNT(*) as count
+          FROM india_news_signals
         `),
         // Sentiment breakdown (all time, last 7 days)
         query(`
@@ -61,6 +66,7 @@ export async function GET() {
     return NextResponse.json({
       todayCount: parseInt(todayStats.rows[0].count),
       weekCount: parseInt(weekStats.rows[0].count),
+      totalCount: parseInt(totalStats.rows[0].count),
       sentiment: {
         positive: sentimentMap["positive"] || { count: 0, percentage: 0 },
         negative: sentimentMap["negative"] || { count: 0, percentage: 0 },
